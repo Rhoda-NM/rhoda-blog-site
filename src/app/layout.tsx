@@ -1,4 +1,6 @@
 import type { Metadata } from "next";
+import { draftMode } from "next/headers";
+import { VisualEditing } from "next-sanity/visual-editing";
 import {
   Geist_Mono,
   Inter,
@@ -8,6 +10,8 @@ import {
 
 import "./globals.css";
 
+import { PreviewBanner } from "@/components/layout/preview-banner";
+import { SiteFooter } from "@/components/layout/site-footer";
 import { SiteHeader } from "@/components/layout/site-header";
 import { ThemeProvider } from "@/components/theme/theme-provider";
 
@@ -62,11 +66,13 @@ export const metadata: Metadata = {
   },
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const { isEnabled: isDraftMode } = await draftMode();
+
   return (
     <html
       lang="en"
@@ -80,8 +86,11 @@ export default function RootLayout({
     >
       <body>
         <ThemeProvider>
+          <PreviewBanner />
           <SiteHeader />
           {children}
+          <SiteFooter />
+          {isDraftMode && <VisualEditing />}
         </ThemeProvider>
       </body>
     </html>

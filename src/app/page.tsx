@@ -10,6 +10,7 @@ import Link from "next/link";
 
 import { ArticleCard } from "@/components/home/article-card";
 import { FeaturedArticle } from "@/components/home/featured-article";
+import { NewsletterSignup } from "@/components/newsletter/newsletter-signup";
 import { client } from "@/sanity/lib/client";
 import { HOMEPAGE_QUERY } from "@/sanity/lib/queries";
 import type {
@@ -308,6 +309,12 @@ export default async function HomePage() {
               />
             ))}
           </div>
+        </div>
+      </section>
+
+      <section id="newsletter" className="scroll-mt-24 border-t border-border py-16 sm:py-20">
+        <div className="site-shell">
+          <NewsletterSignup compact />
         </div>
       </section>
     </main>

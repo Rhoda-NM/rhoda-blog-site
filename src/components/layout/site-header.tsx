@@ -1,11 +1,14 @@
+import { ArrowUpRight, Menu } from "lucide-react";
 import Link from "next/link";
 
 import { ThemeToggle } from "@/components/theme/theme-toggle";
+import { siteConfig } from "@/lib/site";
 
 const navigation = [
   { label: "Articles", href: "/articles" },
   { label: "Topics", href: "/topics" },
   { label: "About", href: "/about" },
+  { label: "Uses", href: "/uses" },
 ];
 
 export function SiteHeader() {
@@ -55,10 +58,26 @@ export function SiteHeader() {
             ))}
           </nav>
 
+          <details className="mobile-menu md:hidden">
+            <summary aria-label="Open navigation menu">
+              <Menu size={19} />
+            </summary>
+            <nav aria-label="Mobile navigation" className="mobile-menu-panel">
+              {navigation.map((item) => (
+                <Link key={item.href} href={item.href}>{item.label}</Link>
+              ))}
+              <Link href="/#newsletter">Newsletter</Link>
+              <a href="/rss.xml">RSS</a>
+              <a href={siteConfig.portfolioUrl} target="_blank" rel="noreferrer noopener">
+                Portfolio <ArrowUpRight size={14} />
+              </a>
+            </nav>
+          </details>
+
           <ThemeToggle />
 
           <Link
-            href="#recent-articles"
+            href="/articles"
             className="button-primary hidden sm:inline-flex"
           >
             Start reading

@@ -156,6 +156,102 @@ export const articleType = defineType({
         }),
 
         defineArrayMember({
+          type: "code",
+          title: "Code Block",
+          options: {
+            language: "typescript",
+            languageAlternatives: [
+              { title: "TypeScript", value: "typescript" },
+              { title: "JavaScript", value: "javascript" },
+              { title: "TSX", value: "tsx" },
+              { title: "JSON", value: "json" },
+              { title: "SQL", value: "sql" },
+              { title: "Bash", value: "bash" },
+              { title: "Python", value: "python" },
+              { title: "Go", value: "go" },
+              { title: "Prisma", value: "prisma" },
+            ],
+            withFilename: true,
+          },
+        }),
+
+        defineArrayMember({
+          name: "callout",
+          title: "Callout",
+          type: "object",
+          fields: [
+            defineField({
+              name: "tone",
+              title: "Callout type",
+              type: "string",
+              options: {
+                layout: "radio",
+                list: [
+                  { title: "Engineering insight", value: "insight" },
+                  { title: "Warning", value: "warning" },
+                  { title: "Trade-off", value: "tradeoff" },
+                  {
+                    title: "Architecture decision",
+                    value: "decision",
+                  },
+                ],
+              },
+              initialValue: "insight",
+              validation: (rule) => rule.required(),
+            }),
+            defineField({
+              name: "title",
+              title: "Title",
+              type: "string",
+              description:
+                "Optional. The callout type is used when no title is provided.",
+              validation: (rule) => rule.max(100),
+            }),
+            defineField({
+              name: "content",
+              title: "Content",
+              type: "array",
+              of: [
+                defineArrayMember({
+                  type: "block",
+                  styles: [{ title: "Normal", value: "normal" }],
+                  lists: [
+                    { title: "Bullet List", value: "bullet" },
+                    { title: "Numbered List", value: "number" },
+                  ],
+                  marks: {
+                    decorators: [
+                      { title: "Strong", value: "strong" },
+                      { title: "Emphasis", value: "em" },
+                      { title: "Inline Code", value: "code" },
+                    ],
+                  },
+                }),
+              ],
+              validation: (rule) => rule.required().min(1),
+            }),
+          ],
+          preview: {
+            select: {
+              title: "title",
+              tone: "tone",
+            },
+            prepare({ title, tone }) {
+              const labels: Record<string, string> = {
+                insight: "Engineering insight",
+                warning: "Warning",
+                tradeoff: "Trade-off",
+                decision: "Architecture decision",
+              };
+
+              return {
+                title: title || labels[tone] || "Callout",
+                subtitle: labels[tone] || "Callout",
+              };
+            },
+          },
+        }),
+        defineArrayMember({
           type: "image",
           options: {
             hotspot: true,
@@ -197,6 +293,30 @@ export const articleType = defineType({
       group: "publishing",
       initialValue: () => new Date().toISOString(),
       validation: (rule) => rule.required(),
+    }),
+
+    defineField({
+      name: "updatedAt",
+      title: "Last Updated",
+      type: "datetime",
+      group: "publishing",
+      description:
+        "Set this when a published article receives a meaningful revision.",
+      validation: (rule) =>
+        rule.custom((updatedAt, context) => {
+          const publishedAt = (context.document as { publishedAt?: string })
+            ?.publishedAt;
+
+          if (
+            updatedAt &&
+            publishedAt &&
+            new Date(updatedAt) < new Date(publishedAt)
+          ) {
+            return "Last updated cannot be earlier than the publication date.";
+          }
+
+          return true;
+        }),
     }),
 
     defineField({
