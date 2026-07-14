@@ -117,4 +117,10 @@ export type ArticleSitemapEntry = {
   slug: string;
   publishedAt: string;
   updatedAt?: string;
+  _updatedAt?: string;
+};
+
+export type TopicSitemapEntry = {
+  slug: string;
+  _updatedAt?: string;
 };

@@ -188,6 +188,7 @@ export const ARTICLE_FEED_QUERY = defineQuery(`
     excerpt,
     publishedAt,
     updatedAt,
+    "_updatedAt": _updatedAt,
     tags,
     category-> {
       _id,
@@ -196,6 +197,7 @@ export const ARTICLE_FEED_QUERY = defineQuery(`
     }
   }
 `);
+
 
 export const TOPICS_QUERY = defineQuery(`
   *[
@@ -284,5 +286,15 @@ export const TOPIC_SLUGS_QUERY = defineQuery(`
     && defined(slug.current)
   ] {
     "slug": slug.current
+  }
+`);
+
+export const TOPIC_SITEMAP_QUERY = defineQuery(`
+  *[
+    _type == "category"
+    && defined(slug.current)
+  ] {
+    "slug": slug.current,
+    "_updatedAt": _updatedAt
   }
 `);
