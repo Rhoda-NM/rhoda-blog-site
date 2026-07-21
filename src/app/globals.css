@@ -650,9 +650,9 @@ html {
 }
 
 .mobile-menu-panel {
-  position: absolute;
-  top: calc(100% + 0.8rem);
-  right: -3.5rem;
+  position: fixed;
+  top: calc(var(--header-height) + 0.5rem);
+  right: 1rem;
   display: grid;
   width: min(18rem, calc(100vw - 2rem));
   overflow: hidden;
