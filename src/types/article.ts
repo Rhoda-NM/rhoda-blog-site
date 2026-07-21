@@ -83,12 +83,28 @@ export type ArticleSummary = {
   category?: ArticleCategory;
 };
 
-export type ArticleDetail = ArticleSummary & {
+export type ArticleDetail = Omit<ArticleSummary, "tags"> & {
+  tags?: ArticleTag[];
+  series?: ArticleSeries | null;
   body?: ArticleBodyBlock[];
   engineeringTakeaway?: string;
   seoTitle?: string;
   seoDescription?: string;
   relatedArticles?: ArticleSummary[];
+};
+
+
+export type ArticleTag = {
+  _id: string;
+  title: string;
+  slug: string;
+};
+
+export type ArticleSeries = {
+  _id: string;
+  title: string;
+  slug: string;
+  description?: string;
 };
 
 export type BlogCategory = {

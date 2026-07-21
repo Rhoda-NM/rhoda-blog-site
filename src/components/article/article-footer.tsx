@@ -26,9 +26,13 @@ export function ArticleFooter({ article }: { article: ArticleDetail }) {
         {article.tags && article.tags.length > 0 && (
           <section className="article-ending-section" aria-label="Article tags">
             <div className="flex flex-wrap gap-2">
-              {article.tags.map((tag) => (
-                <span key={tag} className="rounded-full border border-border bg-surface px-3 py-1.5 font-mono text-xs text-muted-foreground">
-                  {tag}
+              
+              {article.tags?.map((tag) => (
+                <span
+                  key={tag._id}
+                  className="rounded-full border border-border px-3 py-1 text-sm text-muted-foreground"
+                >
+                  {tag.title}
                 </span>
               ))}
             </div>

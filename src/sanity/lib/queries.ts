@@ -96,75 +96,47 @@ export const ARTICLES_QUERY = defineQuery(`
   }
 `);
 
-export const ARTICLE_BY_SLUG_QUERY = defineQuery(`
+export const ARTICLE_BY_SLUG_QUERY = `
   *[
-    _type == "article"
-    && slug.current == $slug
+    _type == "article" &&
+    slug.current == $slug
   ][0] {
     _id,
     title,
     "slug": slug.current,
     excerpt,
+    body,
+    featuredImage,
     publishedAt,
     updatedAt,
-    estimatedReadingMinutes,
     featured,
-    tags,
     engineeringTakeaway,
     seoTitle,
     seoDescription,
 
-    featuredImage {
-      ...,
-      asset->
+    category-> {
+      _id,
+      title,
+      "slug": slug.current
     },
 
-    category-> {
+    "tags": coalesce(
+      tags[]-> {
+        _id,
+        title,
+        "slug": slug.current
+      },
+      []
+    ),
+
+    series-> {
       _id,
       title,
       "slug": slug.current,
       description
-    },
-
-    body[] {
-      ...,
-
-      _type == "image" => {
-        ...,
-        asset->
-      }
-    },
-
-    "relatedArticles": *[
-      _type == "article"
-      && defined(slug.current)
-      && defined(publishedAt)
-      && _id != ^._id
-    ] {
-      _id,
-      title,
-      "slug": slug.current,
-      excerpt,
-      publishedAt,
-      estimatedReadingMinutes,
-      tags,
-      "sameCategory": category._ref == ^.category._ref,
-      "sharedTagCount": count(tags[@ in ^.^.tags]),
-
-      featuredImage {
-        ...,
-        asset->
-      },
-
-      category-> {
-        _id,
-        title,
-        "slug": slug.current
-      }
     }
-    | order(sameCategory desc, sharedTagCount desc, publishedAt desc)[0...3]
   }
-`);
+`;
 
 export const ARTICLE_SLUGS_QUERY = defineQuery(`
   *[
