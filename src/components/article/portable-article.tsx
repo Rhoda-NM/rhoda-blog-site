@@ -1,3 +1,4 @@
+//src/components/article/portable-article.tsx
 import type { PortableTextComponents } from "next-sanity";
 import { PortableText } from "next-sanity";
 import { Image } from "next-sanity/image";
@@ -8,6 +9,8 @@ import {
   Lightbulb,
 } from "lucide-react";
 import Link from "next/link";
+
+import { FlowDiagram, type ArticleFlowDiagram } from "@/components/article/flow-diagram"; 
 
 import { urlFor } from "@/sanity/lib/image";
 import type {
@@ -76,6 +79,9 @@ function createPortableTextComponents(
     },
     types: {
       code: CodeBlock,
+      flowDiagram: ({ value }) => (
+        <FlowDiagram value={value as ArticleFlowDiagram} />
+      ),
       image: ({ value }) => {
         const image = value as SanityImage;
 

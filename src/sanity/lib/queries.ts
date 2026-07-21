@@ -198,47 +198,42 @@ export const ARTICLE_FEED_QUERY = defineQuery(`
   }
 `);
 
-
-export const TOPICS_QUERY = defineQuery(`
+export const TOPICS_QUERY = `
   *[
-    _type == "category"
-    && defined(slug.current)
-  ]
-  | order(title asc) {
+    _type == "category" &&
+    isVisible == true
+  ] | order(displayOrder asc) {
     _id,
     title,
-    "slug": slug.current,
+    slug,
     description,
+    introduction,
+    iconKey,
+    isFeatured,
+    seoTitle,
+    seoDescription,
 
-    "articleCount": count(*[
-      _type == "article"
-      && defined(slug.current)
-      && defined(publishedAt)
-      && category._ref == ^._id
-    ]),
+    "articleCount": count(
+      *[
+        _type == "article" &&
+        defined(publishedAt) &&
+        references(^._id)
+      ]
+    ),
 
     "latestArticles": *[
-      _type == "article"
-      && defined(slug.current)
-      && defined(publishedAt)
-      && category._ref == ^._id
-    ]
-    | order(publishedAt desc)[0...3] {
+      _type == "article" &&
+      defined(publishedAt) &&
+      references(^._id)
+    ] | order(publishedAt desc)[0...3] {
       _id,
       title,
-      "slug": slug.current,
+      slug,
       excerpt,
-      publishedAt,
-      estimatedReadingMinutes,
-
-      category-> {
-        _id,
-        title,
-        "slug": slug.current
-      }
+      publishedAt
     }
   }
-`);
+`;
 
 export const TOPIC_BY_SLUG_QUERY = defineQuery(`
   *[

@@ -43,6 +43,52 @@ export const articleType = defineType({
     }),
 
     defineField({
+      name: "articleFormat",
+      title: "Article Format",
+      type: "string",
+      group: "content",
+
+      options: {
+        layout: "radio",
+        list: [
+          {
+            title: "Technical Deep Dive",
+            value: "technical-deep-dive",
+          },
+          {
+            title: "Architecture Note",
+            value: "architecture-note",
+          },
+          {
+            title: "Project Case Study",
+            value: "project-case-study",
+          },
+          {
+            title: "Engineering Guide",
+            value: "engineering-guide",
+          },
+          {
+            title: "Technical Strategy",
+            value: "technical-strategy",
+          },
+        ],
+      },
+
+      initialValue: "technical-deep-dive",
+      validation: (rule) => rule.required(),
+    }),
+
+    defineField({
+      name: "series",
+      title: "Series",
+      description:
+        "Optional collection this article belongs to, such as Building WebStream.",
+      type: "reference",
+      group: "content",
+      to: [{ type: "series" }],
+    }),
+
+    defineField({
       name: "excerpt",
       title: "Excerpt",
       description:
@@ -65,17 +111,22 @@ export const articleType = defineType({
     defineField({
       name: "tags",
       title: "Tags",
+      description:
+        "Choose specific technologies, patterns, or concepts covered by the article.",
       type: "array",
       group: "content",
+
       of: [
         defineArrayMember({
-          type: "string",
+          type: "reference",
+          to: [{ type: "tag" }],
+          options: {
+            disableNew: true,
+          },
         }),
       ],
-      options: {
-        layout: "tags",
-      },
-      validation: (rule) => rule.unique().max(8),
+
+      validation: (rule) => rule.required().unique().min(2).max(6),
     }),
 
     defineField({
@@ -83,25 +134,29 @@ export const articleType = defineType({
       title: "Featured Image",
       type: "image",
       group: "content",
+
       options: {
         hotspot: true,
       },
+
       fields: [
         defineField({
           name: "alt",
           title: "Alternative Text",
           type: "string",
-          validation: (rule) => rule.required(),
+          validation: (rule) => rule.required().min(10).max(180),
         }),
 
         defineField({
           name: "caption",
           title: "Caption",
           type: "string",
+          validation: (rule) => rule.max(220),
         }),
       ],
-    }),
 
+      validation: (rule) => rule.required(),
+    }),
     defineField({
       name: "body",
       title: "Article Body",
@@ -130,29 +185,51 @@ export const articleType = defineType({
 
             annotations: [
               {
-                name: "link",
-                title: "Link",
+                name: "internalLink",
+                title: "Internal Article Link",
                 type: "object",
+
+                fields: [
+                  {
+                    name: "reference",
+                    title: "Article",
+                    type: "reference",
+                    to: [{ type: "article" }],
+                    validation: (rule) => rule.required(),
+                  },
+                ],
+              },
+              {
+                name: "link",
+                title: "External Link",
+                type: "object",
+
                 fields: [
                   {
                     name: "href",
                     title: "URL",
                     type: "url",
                     validation: (rule) =>
-                      rule.uri({
-                        scheme: ["http", "https", "mailto"],
-                      }),
+                      rule
+                        .required()
+                        .uri({
+                          scheme: ["http", "https", "mailto"],
+                        }),
                   },
                   {
                     name: "openInNewTab",
                     title: "Open in New Tab",
                     type: "boolean",
-                    initialValue: false,
+                    initialValue: true,
                   },
                 ],
               },
             ],
           },
+        }),
+
+        defineArrayMember({
+          type: "flowDiagram",
         }),
 
         defineArrayMember({
@@ -287,11 +364,30 @@ export const articleType = defineType({
     }),
 
     defineField({
+      name: "relatedArticles",
+      title: "Related Articles",
+      description:
+        "Select up to three articles readers should explore next.",
+      type: "array",
+      group: "content",
+
+      of: [
+        defineArrayMember({
+          type: "reference",
+          to: [{ type: "article" }],
+        }),
+      ],
+
+      validation: (rule) => rule.unique().max(3),
+    }),
+    
+    defineField({
       name: "publishedAt",
       title: "Published At",
+      description:
+        "Set this to the date and time the article is first made publicly available.",
       type: "datetime",
       group: "publishing",
-      initialValue: () => new Date().toISOString(),
       validation: (rule) => rule.required(),
     }),
 
@@ -354,6 +450,20 @@ export const articleType = defineType({
       group: "seo",
       validation: (rule) => rule.max(160),
     }),
+    defineField({
+      name: "canonicalUrl",
+      title: "Canonical URL",
+      description:
+        "Only set this when another URL should be treated as the original version of the article.",
+      type: "url",
+      group: "seo",
+
+      validation: (rule) =>
+        rule.uri({
+          scheme: ["http", "https"],
+        }),
+    }),
+    
   ],
 
   orderings: [
