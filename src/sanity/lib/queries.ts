@@ -134,7 +134,30 @@ export const ARTICLE_BY_SLUG_QUERY = `
       title,
       "slug": slug.current,
       description
-    }
+    },
+
+    "relatedArticles": coalesce(
+      relatedArticles[]-> {
+        _id,
+        title,
+        "slug": slug.current,
+        excerpt,
+        publishedAt,
+        updatedAt,
+        estimatedReadingMinutes,
+        featured,
+        featuredImage {
+          ...,
+          asset->
+        },
+        category-> {
+          _id,
+          title,
+          "slug": slug.current
+        }
+      },
+      []
+    )
   }
 `;
 

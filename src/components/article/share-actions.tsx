@@ -1,6 +1,6 @@
 "use client";
 
-import { Check, Copy } from "lucide-react";
+import { Check, Copy, Share2 } from "lucide-react";
 import { useState } from "react";
 
 export function ShareActions({
@@ -21,11 +21,16 @@ export function ShareActions({
   }
 
   return (
-    <section className="article-ending-section" aria-labelledby="share-title">
-      <h2 id="share-title" className="article-ending-title">
-        Was this useful?
+    <section className="article-share-card" aria-labelledby="share-title">
+      <Share2 size={20} className="text-burgundy-soft" aria-hidden="true" />
+      <span className="technical-label">Pass it on</span>
+      <h2 id="share-title" className="article-ending-title mt-3">
+        Useful notes are better shared.
       </h2>
-      <div className="mt-4 flex flex-wrap gap-3">
+      <p className="mt-3 text-sm leading-6 text-muted-foreground">
+        Send this article to someone designing reliable systems.
+      </p>
+      <div className="mt-6 flex flex-wrap gap-3">
         <button type="button" onClick={copyLink} className="button-secondary">
           {copied ? <Check size={15} /> : <Copy size={15} />}
           {copied ? "Copied" : "Copy link"}

@@ -1,5 +1,7 @@
 import { defineArrayMember, defineField, defineType } from "sanity";
 
+import { StudioBlockquote } from "../components/studio-blockquote";
+
 export const articleType = defineType({
   name: "article",
   title: "Article",
@@ -170,7 +172,11 @@ export const articleType = defineType({
             { title: "Heading 2", value: "h2" },
             { title: "Heading 3", value: "h3" },
             { title: "Heading 4", value: "h4" },
-            { title: "Quote", value: "blockquote" },
+            {
+              title: "Quote",
+              value: "blockquote",
+              component: StudioBlockquote,
+            },
           ],
           lists: [
             { title: "Bullet List", value: "bullet" },
@@ -328,56 +334,188 @@ export const articleType = defineType({
         }),
 
         defineArrayMember({
-          name: "flowDiagram",
-          title: "Flow Diagram",
+  name: "flowDiagram",
+  title: "Flow Diagram",
+  type: "object",
+
+  fields: [
+    defineField({
+      name: "title",
+      title: "Title",
+      type: "string",
+      validation: (rule) => rule.max(100),
+    }),
+
+    defineField({
+      name: "items",
+      title: "Diagram items",
+      description:
+        "Add normal steps or a branch group when one step leads to several independent paths.",
+      type: "array",
+
+      of: [
+        defineArrayMember({
+          name: "flowStep",
+          title: "Step",
           type: "object",
 
           fields: [
             defineField({
-              name: "title",
-              title: "Title",
+              name: "label",
+              title: "Label",
+              type: "string",
+              validation: (rule) => rule.required().max(120),
+            }),
+
+            defineField({
+              name: "description",
+              title: "Description",
+              type: "text",
+              rows: 2,
+              validation: (rule) => rule.max(220),
+            }),
+
+            defineField({
+              name: "connectorLabel",
+              title: "Transition to next item",
+              description:
+                'Optional text shown beside the arrow, such as "30 seconds + jitter".',
+              type: "string",
+              validation: (rule) => rule.max(100),
+            }),
+          ],
+
+          preview: {
+            select: {
+              title: "label",
+              subtitle: "connectorLabel",
+            },
+
+            prepare({ title, subtitle }) {
+              return {
+                title: title || "Untitled step",
+                subtitle: subtitle
+                  ? `Then: ${subtitle}`
+                  : "Flow step",
+              };
+            },
+          },
+        }),
+
+        defineArrayMember({
+          name: "flowBranchGroup",
+          title: "Branch Group",
+          type: "object",
+
+          fields: [
+            defineField({
+              name: "label",
+              title: "Group label",
+              description:
+                'Optional label such as "Route to independent queues".',
               type: "string",
               validation: (rule) => rule.max(100),
             }),
 
             defineField({
-              name: "steps",
-              title: "Steps",
+              name: "branches",
+              title: "Branches",
               type: "array",
 
               of: [
                 defineArrayMember({
-                  name: "flowStep",
-                  title: "Flow Step",
+                  name: "flowBranch",
+                  title: "Branch",
                   type: "object",
 
                   fields: [
                     defineField({
                       name: "label",
-                      title: "Label",
+                      title: "Branch label",
+                      description:
+                        'For example: "Storage path" or "Analytics path".',
                       type: "string",
-                      validation: (rule) => rule.required().max(120),
+                      validation: (rule) =>
+                        rule.required().max(100),
                     }),
 
                     defineField({
-                      name: "description",
-                      title: "Description",
-                      type: "text",
-                      rows: 2,
-                      validation: (rule) => rule.max(240),
+                      name: "steps",
+                      title: "Branch steps",
+                      type: "array",
+
+                      of: [
+                        defineArrayMember({
+                          name: "nestedFlowStep",
+                          title: "Nested Step",
+                          type: "object",
+
+                          fields: [
+                            defineField({
+                              name: "label",
+                              title: "Label",
+                              type: "string",
+                              validation: (rule) =>
+                                rule.required().max(120),
+                            }),
+
+                            defineField({
+                              name: "description",
+                              title: "Description",
+                              type: "text",
+                              rows: 2,
+                              validation: (rule) =>
+                                rule.max(180),
+                            }),
+
+                            defineField({
+                              name: "connectorLabel",
+                              title: "Transition to next step",
+                              type: "string",
+                              validation: (rule) =>
+                                rule.max(80),
+                            }),
+                          ],
+
+                          preview: {
+                            select: {
+                              title: "label",
+                              subtitle: "connectorLabel",
+                            },
+
+                            prepare({ title, subtitle }) {
+                              return {
+                                title: title || "Untitled step",
+                                subtitle: subtitle
+                                  ? `Then: ${subtitle}`
+                                  : "Nested step",
+                              };
+                            },
+                          },
+                        }),
+                      ],
+
+                      validation: (rule) =>
+                        rule.required().min(1).max(8),
                     }),
                   ],
 
                   preview: {
                     select: {
                       title: "label",
-                      subtitle: "description",
+                      steps: "steps",
                     },
 
-                    prepare({ title, subtitle }) {
+                    prepare({ title, steps }) {
+                      const count = Array.isArray(steps)
+                        ? steps.length
+                        : 0;
+
                       return {
-                        title: title || "Untitled step",
-                        subtitle,
+                        title: title || "Untitled branch",
+                        subtitle: `${count} ${
+                          count === 1 ? "step" : "steps"
+                        }`,
                       };
                     },
                   },
@@ -385,38 +523,75 @@ export const articleType = defineType({
               ],
 
               validation: (rule) =>
-                rule
-                  .required()
-                  .min(2)
-                  .max(12)
-                  .error("Add between 2 and 12 flow steps."),
+                rule.required().min(2).max(6),
             }),
 
             defineField({
-              name: "caption",
-              title: "Caption",
+              name: "connectorLabel",
+              title: "Transition after branches",
+              description:
+                "Optional text shown before the next top-level item.",
               type: "string",
-              validation: (rule) => rule.max(220),
+              validation: (rule) => rule.max(100),
             }),
           ],
 
           preview: {
             select: {
-              title: "title",
-              steps: "steps",
+              title: "label",
+              branches: "branches",
             },
 
-            prepare({ title, steps }) {
-              const count = Array.isArray(steps) ? steps.length : 0;
+            prepare({ title, branches }) {
+              const count = Array.isArray(branches)
+                ? branches.length
+                : 0;
 
               return {
-                title: title || "Flow diagram",
-                subtitle: `${count} ${count === 1 ? "step" : "steps"}`,
+                title: title || "Branch group",
+                subtitle: `${count} ${
+                  count === 1 ? "branch" : "branches"
+                }`,
               };
             },
           },
         }),
+      ],
 
+      validation: (rule) =>
+        rule
+          .required()
+          .min(2)
+          .max(16)
+          .error("Add between 2 and 16 diagram items."),
+    }),
+
+    defineField({
+      name: "caption",
+      title: "Caption",
+      type: "string",
+      validation: (rule) => rule.max(220),
+    }),
+  ],
+
+  preview: {
+    select: {
+      title: "title",
+      items: "items",
+    },
+
+    prepare({ title, items }) {
+      const count = Array.isArray(items) ? items.length : 0;
+
+      return {
+        title: title || "Flow diagram",
+        subtitle: `${count} diagram ${
+          count === 1 ? "item" : "items"
+        }`,
+      };
+    },
+  },
+}),
         defineArrayMember({
           type: "image",
           options: {

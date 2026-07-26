@@ -154,124 +154,96 @@ export default async function ArticlePage({
         }}
       />
       <article>
-        <header className="technical-grid border-b border-border">
-            <div className="site-shell py-7 sm:py-9 lg:py-10">
-                <div className="mx-auto max-w-6xl">
-                <Link
-                    href="/articles"
-                    className="
-                    inline-flex items-center gap-2
-                    text-sm font-semibold text-muted-foreground
-                    transition-colors hover:text-foreground
-                    "
-                >
-                    <ArrowLeft size={15} />
-                    All articles
-                </Link>
+        <header className="article-hero technical-grid">
+          <div className="site-shell">
+            <div className="article-hero-inner">
+              <Link href="/articles" className="article-back-link">
+                <ArrowLeft size={15} />
+                All articles
+              </Link>
 
-                <div className="mt-6 text-center">
-                    {article.category && (
-                    <Link
-                        href={`/topics/${article.category.slug}`}
-                        className="
-                        font-mono text-[0.7rem] font-semibold uppercase
-                        tracking-[0.12em] text-burgundy-soft
-                        "
-                    >
-                        {article.category.title}
-                    </Link>
-                    )}
+              <div className="article-hero-tags" aria-label="Article topics">
+                {article.category && (
+                  <Link
+                    href={`/topics/${article.category.slug}`}
+                    className="article-topic-pill article-topic-pill-primary"
+                  >
+                    {article.category.title}
+                  </Link>
+                )}
+                {article.tags?.map((tag) => (
+                  <span key={tag._id} className="article-topic-pill">
+                    {tag.title}
+                  </span>
+                ))}
+              </div>
 
-                    <h1
-                    className="
-                        editorial-heading mx-auto mt-4 max-w-[17ch]
-                        text-[clamp(2.65rem,4.5vw,4.5rem)]
-                        leading-[0.98] tracking-[-0.04em]
-                    "
-                    >
-                    {article.title}
-                    <span className="text-burgundy-soft">.</span>
-                    </h1>
+              <div className="article-hero-grid">
+                <h1 className="article-hero-title editorial-heading">
+                  {article.title}
+                  <span className="text-burgundy-soft">.</span>
+                </h1>
 
-                    <p
-                    className="
-                        mx-auto mt-5 max-w-2xl
-                        text-base leading-7 text-muted-foreground
-                        sm:text-lg
-                    "
-                    >
-                    {article.excerpt}
-                    </p>
+                <div className="article-hero-summary">
+                  <p className="article-hero-excerpt">{article.excerpt}</p>
 
-                    <div
-                    className="
-                        mt-5 flex flex-wrap items-center justify-center
-                        gap-x-3 gap-y-2
-                        font-mono text-[0.68rem] uppercase
-                        tracking-[0.08em] text-faint-foreground
-                    "
-                    >
-                    <span>
-                      Published{" "}
-                      <time dateTime={article.publishedAt}>
-                        {formatArticleDate(article.publishedAt)}
-                      </time>
-                    </span>
-
+                  <dl className="article-hero-meta">
+                    <div>
+                      <dt>Published</dt>
+                      <dd>
+                        <time dateTime={article.publishedAt}>
+                          {formatArticleDate(article.publishedAt)}
+                        </time>
+                      </dd>
+                    </div>
+                    <div>
+                      <dt>Reading time</dt>
+                      <dd className="inline-flex items-center gap-1.5">
+                        <Clock3 size={13} />
+                        {readingTime} min
+                      </dd>
+                    </div>
+                    <div>
+                      <dt>Written by</dt>
+                      <dd>Rhoda Muya</dd>
+                    </div>
                     {article.updatedAt && (
-                      <>
-                        <span aria-hidden="true">•</span>
-                        <span>
-                          Updated{" "}
+                      <div>
+                        <dt>Updated</dt>
+                        <dd>
                           <time dateTime={article.updatedAt}>
                             {formatArticleDate(article.updatedAt)}
                           </time>
-                        </span>
-                      </>
+                        </dd>
+                      </div>
                     )}
-
-                    <span aria-hidden="true">•</span>
-
-                    <span className="inline-flex items-center gap-1.5">
-                        <Clock3 size={13} />
-                        {readingTime} min read
-                    </span>
-
-                    <span aria-hidden="true">•</span>
-
-                    <span>Rhoda Muya</span>
-                    </div>
+                  </dl>
                 </div>
-                </div>
+              </div>
 
-                {article.featuredImage?.asset && (
-                <div
-                    className="
-                    mx-auto mt-8 max-w-5xl overflow-hidden
-                    rounded-[1.25rem] border border-border
-                    bg-surface-muted
-                    "
-                >
-                    <Image
+              {article.featuredImage?.asset && (
+                <div className="article-hero-image">
+                  <Image
                     src={urlFor(article.featuredImage)
-                        .width(1600)
-                        .height(900)
-                        .fit("crop")
-                        .auto("format")
-                        .url()}
+                      .width(1600)
+                      .height(900)
+                      .fit("crop")
+                      .auto("format")
+                      .url()}
                     alt={article.featuredImage.alt ?? article.title}
                     width={1600}
                     height={900}
                     priority
-                    sizes="(max-width: 1024px) 100vw, 1100px"
+                    sizes="(max-width: 1024px) 100vw, 1280px"
                     className="h-auto w-full object-cover"
-                    />
+                  />
                 </div>
-                )}
+              )}
             </div>
-            </header>
+          </div>
+        </header>
 
-        <div className="site-shell py-14 sm:py-20">
+        <div className="site-shell py-12 sm:py-16 lg:py-20">
           <div className="article-layout">
             <div className="min-w-0">
               <PortableArticle article={article} />

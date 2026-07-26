@@ -10,7 +10,7 @@ export function ArticleFooter({ article }: { article: ArticleDetail }) {
 
   return (
     <footer className="article-footer">
-      <div className="reading-shell article-ending-stack">
+      <div className="reading-shell">
         {article.engineeringTakeaway && (
           <section className="engineering-takeaway" aria-labelledby="takeaway-title">
             <span className="font-mono text-xs font-semibold uppercase tracking-[0.12em] text-brass">
@@ -22,32 +22,18 @@ export function ArticleFooter({ article }: { article: ArticleDetail }) {
             </p>
           </section>
         )}
-
-        {article.tags && article.tags.length > 0 && (
-          <section className="article-ending-section" aria-label="Article tags">
-            <div className="flex flex-wrap gap-2">
-              
-              {article.tags?.map((tag) => (
-                <span
-                  key={tag._id}
-                  className="rounded-full border border-border px-3 py-1 text-sm text-muted-foreground"
-                >
-                  {tag.title}
-                </span>
-              ))}
-            </div>
-          </section>
-        )}
-
-        <ShareActions title={article.title} url={articleUrl} />
-        <AuthorCard />
       </div>
 
-      <RelatedArticles articles={article.relatedArticles ?? []} />
+      <div className="article-ending-wide article-closing-grid">
+        <AuthorCard />
+        <ShareActions title={article.title} url={articleUrl} />
+      </div>
 
       <div className="article-ending-wide">
         <NewsletterSignup />
       </div>
+
+      <RelatedArticles articles={article.relatedArticles ?? []} />
     </footer>
   );
 }
