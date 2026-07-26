@@ -96,7 +96,7 @@ export const articleType = defineType({
       type: "text",
       rows: 3,
       group: "content",
-      validation: (rule) => rule.required().min(60).max(220),
+      validation: (rule) => rule.required().min(60).max(250),
     }),
 
     defineField({
@@ -228,9 +228,7 @@ export const articleType = defineType({
           },
         }),
 
-        defineArrayMember({
-          type: "flowDiagram",
-        }),
+       
 
         defineArrayMember({
           type: "code",
@@ -328,6 +326,97 @@ export const articleType = defineType({
             },
           },
         }),
+
+        defineArrayMember({
+          name: "flowDiagram",
+          title: "Flow Diagram",
+          type: "object",
+
+          fields: [
+            defineField({
+              name: "title",
+              title: "Title",
+              type: "string",
+              validation: (rule) => rule.max(100),
+            }),
+
+            defineField({
+              name: "steps",
+              title: "Steps",
+              type: "array",
+
+              of: [
+                defineArrayMember({
+                  name: "flowStep",
+                  title: "Flow Step",
+                  type: "object",
+
+                  fields: [
+                    defineField({
+                      name: "label",
+                      title: "Label",
+                      type: "string",
+                      validation: (rule) => rule.required().max(120),
+                    }),
+
+                    defineField({
+                      name: "description",
+                      title: "Description",
+                      type: "text",
+                      rows: 2,
+                      validation: (rule) => rule.max(240),
+                    }),
+                  ],
+
+                  preview: {
+                    select: {
+                      title: "label",
+                      subtitle: "description",
+                    },
+
+                    prepare({ title, subtitle }) {
+                      return {
+                        title: title || "Untitled step",
+                        subtitle,
+                      };
+                    },
+                  },
+                }),
+              ],
+
+              validation: (rule) =>
+                rule
+                  .required()
+                  .min(2)
+                  .max(12)
+                  .error("Add between 2 and 12 flow steps."),
+            }),
+
+            defineField({
+              name: "caption",
+              title: "Caption",
+              type: "string",
+              validation: (rule) => rule.max(220),
+            }),
+          ],
+
+          preview: {
+            select: {
+              title: "title",
+              steps: "steps",
+            },
+
+            prepare({ title, steps }) {
+              const count = Array.isArray(steps) ? steps.length : 0;
+
+              return {
+                title: title || "Flow diagram",
+                subtitle: `${count} ${count === 1 ? "step" : "steps"}`,
+              };
+            },
+          },
+        }),
+
         defineArrayMember({
           type: "image",
           options: {

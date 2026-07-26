@@ -170,42 +170,43 @@ export const ARTICLE_FEED_QUERY = defineQuery(`
   }
 `);
 
-export const TOPICS_QUERY = `
+export const TOPICS_QUERY = defineQuery(`
   *[
     _type == "category" &&
-    isVisible == true
-  ] | order(displayOrder asc) {
+    coalesce(isVisible, true) == true
+  ]
+  | order(coalesce(displayOrder, 999) asc, title asc) {
     _id,
     title,
-    slug,
+    "slug": slug.current,
     description,
     introduction,
     iconKey,
+    displayOrder,
     isFeatured,
-    seoTitle,
-    seoDescription,
 
     "articleCount": count(
       *[
         _type == "article" &&
-        defined(publishedAt) &&
-        references(^._id)
+        category._ref == ^._id &&
+        defined(publishedAt)
       ]
     ),
 
     "latestArticles": *[
       _type == "article" &&
-      defined(publishedAt) &&
-      references(^._id)
-    ] | order(publishedAt desc)[0...3] {
+      category._ref == ^._id &&
+      defined(publishedAt)
+    ]
+    | order(publishedAt desc)[0...3] {
       _id,
       title,
-      slug,
+      "slug": slug.current,
       excerpt,
       publishedAt
     }
   }
-`;
+`);
 
 export const TOPIC_BY_SLUG_QUERY = defineQuery(`
   *[
