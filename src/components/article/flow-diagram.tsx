@@ -4,7 +4,7 @@ import { Fragment } from "react";
 import { ArrowDown, GitBranch } from "lucide-react";
 
 type FlowStep = {
-  _type?: "flowStep" | "nestedFlowStep";
+  _type?: "flowStep" | "nestedFlowStep" | "flowDecisionStep";
   _key?: string;
   label?: string;
   description?: string;
@@ -26,7 +26,23 @@ type FlowBranchGroup = {
   connectorLabel?: string;
 };
 
-type FlowItem = FlowStep | FlowBranchGroup;
+type FlowOutcome = {
+  _type?: "flowOutcome";
+  _key?: string;
+  label?: string;
+  items?: NestedFlowItem[];
+};
+
+type FlowDecision = {
+  _type: "flowDecision";
+  _key?: string;
+  label?: string;
+  outcomes?: FlowOutcome[];
+  connectorLabel?: string;
+};
+
+type NestedFlowItem = FlowStep | FlowDecision;
+type FlowItem = FlowStep | FlowDecision | FlowBranchGroup;
 
 export type ArticleFlowDiagram = {
   _type: "flowDiagram";
@@ -181,6 +197,93 @@ function BranchGroup({
   );
 }
 
+function isDecision(item: FlowItem | NestedFlowItem): item is FlowDecision {
+  return item._type === "flowDecision";
+}
+
+function NestedItems({ items }: { items?: NestedFlowItem[] }) {
+  const visibleItems =
+    items?.filter((item) =>
+      isDecision(item)
+        ? item.label && item.outcomes?.length
+        : item.label,
+    ) ?? [];
+
+  return (
+    <ol>
+      {visibleItems.map((item, index) => {
+        const isLast = index === visibleItems.length - 1;
+
+        return (
+          <li key={item._key ?? `${item._type ?? "step"}-${index}`}>
+            {isDecision(item) ? (
+              <DecisionNode decision={item} nested />
+            ) : (
+              <StepNode step={item} nested />
+            )}
+
+            {!isLast ? <Connector label={item.connectorLabel} /> : null}
+          </li>
+        );
+      })}
+    </ol>
+  );
+}
+
+function DecisionNode({
+  decision,
+  nested = false,
+}: {
+  decision: FlowDecision;
+  nested?: boolean;
+}) {
+  const outcomes =
+    decision.outcomes?.filter((outcome) => outcome.items?.length) ?? [];
+
+  if (!decision.label || outcomes.length === 0) {
+    return null;
+  }
+
+  return (
+    <section
+      className={`w-full rounded-xl border border-border bg-background/40 ${
+        nested ? "p-2.5" : "p-3"
+      }`}
+    >
+      <div className="mx-auto mb-3 flex w-fit max-w-lg items-center gap-2 rounded-lg border border-border-strong bg-surface px-3 py-2 text-center shadow-[0_1px_2px_rgba(0,0,0,0.04)]">
+        <GitBranch
+          className="size-3.5 shrink-0 text-muted-foreground"
+          strokeWidth={1.75}
+          aria-hidden="true"
+        />
+        <p className="text-xs font-semibold leading-5 text-foreground">
+          {decision.label}
+        </p>
+      </div>
+
+      <div
+        className={`grid grid-cols-1 gap-2.5 ${
+          outcomes.length > 1 ? "sm:grid-cols-2" : ""
+        }`}
+      >
+        {outcomes.map((outcome, outcomeIndex) => (
+          <div
+            key={outcome._key ?? `${outcome.label ?? "outcome"}-${outcomeIndex}`}
+            className="rounded-lg border border-border bg-surface-subtle p-2.5"
+          >
+            {outcome.label ? (
+              <p className="mb-2.5 text-center font-mono text-[10px] font-semibold uppercase tracking-[0.14em] text-muted-foreground">
+                {outcome.label}
+              </p>
+            ) : null}
+            <NestedItems items={outcome.items} />
+          </div>
+        ))}
+      </div>
+    </section>
+  );
+}
+
 function isBranchGroup(
   item: FlowItem,
 ): item is FlowBranchGroup {
@@ -229,6 +332,8 @@ export function FlowDiagram({
             >
               {isBranchGroup(item) ? (
                 <BranchGroup group={item} />
+              ) : isDecision(item) ? (
+                <DecisionNode decision={item} />
               ) : (
                 <StepNode step={item} />
               )}

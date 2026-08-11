@@ -350,7 +350,7 @@ export const articleType = defineType({
       name: "items",
       title: "Diagram items",
       description:
-        "Add normal steps or a branch group when one step leads to several independent paths.",
+        "Add a step, decision, or parallel branch.",
       type: "array",
 
       of: [
@@ -404,13 +404,13 @@ export const articleType = defineType({
 
         defineArrayMember({
           name: "flowBranchGroup",
-          title: "Branch Group",
+          title: "Parallel Branch",
           type: "object",
 
           fields: [
             defineField({
               name: "label",
-              title: "Group label",
+              title: "Branch point",
               description:
                 'Optional label such as "Route to independent queues".',
               type: "string",
@@ -419,19 +419,19 @@ export const articleType = defineType({
 
             defineField({
               name: "branches",
-              title: "Branches",
+              title: "Parallel paths",
               type: "array",
 
               of: [
                 defineArrayMember({
                   name: "flowBranch",
-                  title: "Branch",
+                  title: "Path",
                   type: "object",
 
                   fields: [
                     defineField({
                       name: "label",
-                      title: "Branch label",
+                      title: "Path",
                       description:
                         'For example: "Storage path" or "Analytics path".',
                       type: "string",
@@ -441,7 +441,7 @@ export const articleType = defineType({
 
                     defineField({
                       name: "steps",
-                      title: "Branch steps",
+                      title: "Steps for this path",
                       type: "array",
 
                       of: [
@@ -512,7 +512,7 @@ export const articleType = defineType({
                         : 0;
 
                       return {
-                        title: title || "Untitled branch",
+                        title: title || "Untitled path",
                         subtitle: `${count} ${
                           count === 1 ? "step" : "steps"
                         }`,
@@ -528,7 +528,7 @@ export const articleType = defineType({
 
             defineField({
               name: "connectorLabel",
-              title: "Transition after branches",
+              title: "Transition after parallel paths",
               description:
                 "Optional text shown before the next top-level item.",
               type: "string",
@@ -548,13 +548,16 @@ export const articleType = defineType({
                 : 0;
 
               return {
-                title: title || "Branch group",
+                title: title || "Parallel branch",
                 subtitle: `${count} ${
-                  count === 1 ? "branch" : "branches"
+                  count === 1 ? "path" : "paths"
                 }`,
               };
             },
           },
+        }),
+        defineArrayMember({
+          type: "flowDecision",
         }),
       ],
 
