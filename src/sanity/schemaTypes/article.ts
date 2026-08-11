@@ -593,6 +593,9 @@ export const articleType = defineType({
   },
 }),
         defineArrayMember({
+          type: "table",
+        }),
+        defineArrayMember({
           type: "image",
           options: {
             hotspot: true,

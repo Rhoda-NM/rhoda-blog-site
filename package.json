@@ -5,6 +5,8 @@
   "scripts": {
     "dev": "next dev --webpack",
     "dev:turbo": "next dev --turbopack",
+    "studio": "sanity dev",
+    "studio:build": "sanity build",
     "build": "next build",
     "start": "next start",
     "lint": "eslint"

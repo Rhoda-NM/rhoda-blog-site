@@ -8,6 +8,7 @@
  */
 
 import { NextStudio } from 'next-sanity/studio'
+import { redirect } from 'next/navigation'
 import config from '../../../../sanity.config'
 
 export const dynamic = 'force-static'
@@ -15,5 +16,9 @@ export const dynamic = 'force-static'
 export { metadata, viewport } from 'next-sanity/studio'
 
 export default function StudioPage() {
+  if (process.env.NODE_ENV === 'development') {
+    redirect('http://localhost:3333')
+  }
+
   return <NextStudio config={config} />
 }

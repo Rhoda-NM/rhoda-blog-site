@@ -1,5 +1,8 @@
 import type { PortableTextBlock } from "@portabletext/types";
 
+import type { ArticleTable } from "@/components/article/article-table";
+import type { ArticleFlowDiagram } from "@/components/article/flow-diagram";
+
 export type SanityImage = {
   _type: "image";
   _key?: string;
@@ -60,6 +63,8 @@ export type ArticleBodyBlock =
   | PortableTextBlock
   | ArticleCodeBlock
   | ArticleCallout
+  | ArticleFlowDiagram
+  | ArticleTable
   | SanityImage;
 
 export type ArticleCategory = {

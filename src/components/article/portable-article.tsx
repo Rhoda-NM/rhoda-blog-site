@@ -20,6 +20,10 @@ import type {
 } from "@/types/article";
 
 import { getArticleHeadings } from "./article-headings";
+import {
+  ArticleTable,
+  type ArticleTable as ArticleTableValue,
+} from "./article-table";
 import { CodeBlock } from "./code-block";
 
 type LinkValue = {
@@ -81,6 +85,9 @@ function createPortableTextComponents(
       code: CodeBlock,
       flowDiagram: ({ value }) => (
         <FlowDiagram value={value as ArticleFlowDiagram} />
+      ),
+      table: ({ value }) => (
+        <ArticleTable value={value as ArticleTableValue} />
       ),
       image: ({ value }) => {
         const image = value as SanityImage;

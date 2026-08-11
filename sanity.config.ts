@@ -33,20 +33,29 @@ import { schema } from "./src/sanity/schemaTypes";
 import { codeInput } from "@sanity/code-input";
 import { presentationTool } from "sanity/presentation";
 
+const projectId =
+  process.env.NEXT_PUBLIC_SANITY_PROJECT_ID ??
+  process.env.SANITY_STUDIO_PROJECT_ID;
+const dataset =
+  process.env.NEXT_PUBLIC_SANITY_DATASET ??
+  process.env.SANITY_STUDIO_DATASET;
+const previewOrigin =
+  process.env.NEXT_PUBLIC_SITE_URL ??
+  process.env.SANITY_STUDIO_PREVIEW_URL ??
+  "http://localhost:3000";
+
 export default defineConfig({
   name: "default",
   title: "Rhoda Muya Engineering Notes",
 
-  projectId: process.env.NEXT_PUBLIC_SANITY_PROJECT_ID!,
-  dataset: process.env.NEXT_PUBLIC_SANITY_DATASET!,
+  projectId: projectId!,
+  dataset: dataset!,
 
   plugins: [
     structureTool(),
     presentationTool({
       previewUrl: {
-        origin:
-          process.env.NEXT_PUBLIC_SITE_URL ??
-          "http://localhost:3000",
+        origin: previewOrigin,
         previewMode: {
           enable: "/api/draft-mode/enable",
         },
@@ -57,4 +66,21 @@ export default defineConfig({
   ],
 
   schema,
+
+  form: {
+    components: {
+      portableText: {
+        plugins: (props) =>
+          props.renderDefault({
+            ...props,
+            plugins: {
+              ...props.plugins,
+              table: {
+                enabled: true,
+              },
+            },
+          }),
+      },
+    },
+  },
 });

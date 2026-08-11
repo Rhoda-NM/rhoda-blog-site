@@ -1,24 +1,29 @@
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
-## Getting Started
+## Local development
 
-First, run the development server:
+Run the website and Sanity Studio as separate development servers. Keeping the
+Studio on its native Vite server avoids the slow, memory-heavy embedded Studio
+compilation in Next.js.
 
 ```bash
+# Terminal 1 — website
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+
+# Terminal 2 — authoring Studio
+npm run studio
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open:
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+- Website: [http://localhost:3000](http://localhost:3000)
+- Studio: [http://localhost:3333](http://localhost:3333)
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+During development, `/studio` redirects to the standalone Studio. The embedded
+route remains available in production as a deployment fallback.
+
+If either server becomes sluggish after dependency changes, stop all old
+development processes with `Ctrl+C` before starting these two commands again.
 
 ## Learn More
 
