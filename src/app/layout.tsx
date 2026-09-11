@@ -14,6 +14,9 @@ import { PreviewBanner } from "@/components/layout/preview-banner";
 import { SiteFooter } from "@/components/layout/site-footer";
 import { SiteHeader } from "@/components/layout/site-header";
 import { ThemeProvider } from "@/components/theme/theme-provider";
+import { Analytics } from "@vercel/analytics/next";
+import { SpeedInsights } from "@vercel/speed-insights/next";
+
 
 const inter = Inter({
   subsets: ["latin"],
@@ -89,6 +92,8 @@ export default async function RootLayout({
           <PreviewBanner />
           <SiteHeader />
           {children}
+          <Analytics />
+          <SpeedInsights />
           <SiteFooter />
           {isDraftMode && <VisualEditing />}
         </ThemeProvider>
@@ -96,3 +101,4 @@ export default async function RootLayout({
     </html>
   );
 }
+
